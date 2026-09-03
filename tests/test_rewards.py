@@ -1,7 +1,8 @@
 from backend.rewards import (calculate_trustpilot_reward, 
                              calculate_cvc_reward, 
                              calculate_referral_reward,
-                             calculate_long_service_reward)
+                             calculate_long_service_reward,
+                             get_scorecard_stars)
 
 
 # Test a 5 star Trustpilot review
@@ -97,4 +98,34 @@ def test_long_service_more_than_five_years():
 
     result = calculate_long_service_reward(10)
 
+    assert result == 5
+
+
+# Test the lowest scorecard star range
+def test_scorecard_one_star():
+    result = get_scorecard_stars(10)
+    assert result == 1
+
+
+# Test the second star range
+def test_scorecard_two_stars():
+    result = get_scorecard_stars(14)
+    assert result == 2
+
+
+# Test the third star range
+def test_scorecard_three_stars():
+    result = get_scorecard_stars(19)
+    assert result == 3
+
+
+# Test the fourth star range
+def test_scorecard_four_stars():
+    result = get_scorecard_stars(23)
+    assert result == 4
+
+
+# Test the fifth star range
+def test_scorecard_five_stars():
+    result = get_scorecard_stars(25)
     assert result == 5

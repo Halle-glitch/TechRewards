@@ -1,5 +1,11 @@
-from backend.rules import (TRUSTPILOT_REWARD,CVC_REWARD,CVC_NAMED_TECHNICIAN_REWARD,
-                           REFERRAL_REWARD,REFERRAL_REQUIRED_MONTHS,LONG_SERVICE_YEARS, LONG_SERVICE_EXTRA_DAYS)
+from backend.rules import (TRUSTPILOT_REWARD,
+                           CVC_REWARD,
+                           CVC_NAMED_TECHNICIAN_REWARD,
+                           REFERRAL_REWARD,
+                           REFERRAL_REQUIRED_MONTHS,
+                           LONG_SERVICE_YEARS, 
+                           LONG_SERVICE_EXTRA_DAYS,
+                           SCORECARD_STAR_RANGES)
 
 
 # Calculate Trustpilot reward
@@ -47,4 +53,18 @@ def calculate_long_service_reward(years_employed):
         return LONG_SERVICE_EXTRA_DAYS
 
     # No extra days before 5 years
+    return 0
+
+
+# Calculate scorecard stars
+def get_scorecard_stars(points):
+
+    # Check each star range
+    for minimum_points, maximum_points, stars in SCORECARD_STAR_RANGES:
+
+        # Check if the points are inside this range
+        if minimum_points <= points <= maximum_points:
+            return stars
+
+    # Return no stars if the points are outside the valid range
     return 0

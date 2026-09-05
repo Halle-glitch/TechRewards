@@ -2,7 +2,8 @@ from backend.rewards import (calculate_trustpilot_reward,
                              calculate_cvc_reward, 
                              calculate_referral_reward,
                              calculate_long_service_reward,
-                             get_scorecard_stars)
+                             get_scorecard_stars,
+                             calculate_together_bonus)
 
 
 # Test a 5 star Trustpilot review
@@ -129,3 +130,33 @@ def test_scorecard_four_stars():
 def test_scorecard_five_stars():
     result = get_scorecard_stars(25)
     assert result == 5
+
+
+# Test the Together Bonus for 3 stars
+def test_together_bonus_three_stars():
+    result = calculate_together_bonus(3)
+    assert result == 975
+
+
+# Test the Together Bonus for 1 star
+def test_together_bonus_one_star():
+    result = calculate_together_bonus(1)
+    assert result == 682.5
+
+
+# Test the Together Bonus for 2 stars
+def test_together_bonus_two_stars():
+    result = calculate_together_bonus(2)
+    assert result == 828.75
+
+
+# Test the Together Bonus for 4 stars
+def test_together_bonus_four_stars():
+    result = calculate_together_bonus(4)
+    assert result == 1121.25
+
+
+# Test the Together Bonus for 5 stars
+def test_together_bonus_five_stars():
+    result = calculate_together_bonus(5)
+    assert result == 1267.5

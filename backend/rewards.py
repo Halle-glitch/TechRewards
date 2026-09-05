@@ -1,11 +1,14 @@
-from backend.rules import (TRUSTPILOT_REWARD,
-                           CVC_REWARD,
-                           CVC_NAMED_TECHNICIAN_REWARD,
-                           REFERRAL_REWARD,
-                           REFERRAL_REQUIRED_MONTHS,
-                           LONG_SERVICE_YEARS, 
-                           LONG_SERVICE_EXTRA_DAYS,
-                           SCORECARD_STAR_RANGES)
+from backend.rules import (
+    TRUSTPILOT_REWARD,
+    CVC_REWARD,
+    CVC_NAMED_TECHNICIAN_REWARD,
+    REFERRAL_REWARD,
+    REFERRAL_REQUIRED_MONTHS,
+    LONG_SERVICE_YEARS,
+    LONG_SERVICE_EXTRA_DAYS,
+    SCORECARD_STAR_RANGES,
+    SCORECARD_MODIFIERS,
+    TOGETHER_BONUS_MAX)
 
 
 # Calculate Trustpilot reward
@@ -68,3 +71,16 @@ def get_scorecard_stars(points):
 
     # Return no stars if the points are outside the valid range
     return 0
+
+
+# Calculate the Together Bonus
+def calculate_together_bonus(stars):
+
+    # Get the modifier for the number of stars
+    modifier = SCORECARD_MODIFIERS[stars]
+
+    # Calculate the bonus
+    bonus = TOGETHER_BONUS_MAX * (1 + modifier)
+
+    # Return the bonus
+    return bonus

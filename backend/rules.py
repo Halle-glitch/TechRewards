@@ -6,7 +6,8 @@ LEAD_COMMISSION_BRACKETS = [
     (2500, 0.04),
     (6000, 0.05),
     (12000, 0.06),
-    (22000, 0.07),]
+    (22000, 0.07),
+]
 
 
 # Customer feedback rewards
@@ -36,7 +37,8 @@ SCORECARD_STAR_RANGES = [
     (14, 18, 2),
     (19, 22, 3),
     (23, 24, 4),
-    (25, 30, 5),]
+    (25, 30, 5),
+]
 
 
 # Scorecard modifiers
@@ -45,7 +47,8 @@ SCORECARD_MODIFIERS = {
     2: -0.15,
     3: 0.00,
     4: 0.15,
-    5: 0.30,}
+    5: 0.30,
+}
 
 
 # Together Bonus
@@ -61,3 +64,26 @@ TOGETHER_SOS_GATE = 0.95
 # Special payment for 5 star technicians
 TOGETHER_FIVE_STAR_GATE_FAILURE = 300
 
+
+# Lead Statuses
+LEAD_STATUSES = [
+    "Created",
+    "Sent",
+    "Received",
+    "Survey",
+    "Quote",
+    "Won",
+    "Lost",
+]
+
+
+# Lead status transitions
+LEAD_STATUS_TRANSITIONS = {
+    "Created": ["Sent"],
+    "Sent": ["Received"],
+    "Received": ["Survey"],
+    "Survey": ["Quote"],
+    "Quote": ["Won", "Lost"],
+    "Won": [],
+    "Lost": [],
+}

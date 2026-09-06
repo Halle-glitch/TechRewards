@@ -1,9 +1,13 @@
-from backend.rewards import (calculate_trustpilot_reward, 
-                             calculate_cvc_reward, 
-                             calculate_referral_reward,
-                             calculate_long_service_reward,
-                             get_scorecard_stars,
-                             calculate_together_bonus)
+from backend.rewards import (
+    calculate_trustpilot_reward,
+    calculate_cvc_reward,
+    calculate_referral_reward,
+    calculate_long_service_reward,
+    get_scorecard_stars,
+    calculate_together_bonus,
+    check_together_bonus_gateways,
+    calculate_final_together_bonus,
+)
 
 
 # Test a 5 star Trustpilot review
@@ -159,4 +163,34 @@ def test_together_bonus_four_stars():
 # Test the Together Bonus for 5 stars
 def test_together_bonus_five_stars():
     result = calculate_together_bonus(5)
+    assert result == 1267.5
+
+
+# Test that the branch passes both Together Bonus gateways
+def test_together_bonus_gateways_pass():
+    result = check_together_bonus_gateways(0.98, 0.95)
+    assert result is True
+
+
+# Test that the branch fails when revenue is below the gateway
+def test_together_bonus_revenue_gateway_fails():
+    result = check_together_bonus_gateways(0.97, 0.95)
+    assert result is False
+
+
+# Test that the branch fails when SOS is below the gateway
+def test_together_bonus_sos_gateway_fails():
+    result = check_together_bonus_gateways(0.98, 0.94)
+    assert result is False
+
+
+# Test that the branch fails when both gateways are below the minimum
+def test_together_bonus_both_gateways_fail():
+    result = check_together_bonus_gateways(0.97, 0.94)
+    assert result is False
+
+
+# Test the final Together Bonus when 5 stars and gateways pass
+def test_final_together_bonus_five_stars_gateways_pass():
+    result = calculate_final_together_bonus(5, 0.98, 0.95)
     assert result == 1267.5

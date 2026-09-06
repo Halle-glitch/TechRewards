@@ -8,7 +8,11 @@ from backend.rules import (
     LONG_SERVICE_EXTRA_DAYS,
     SCORECARD_STAR_RANGES,
     SCORECARD_MODIFIERS,
-    TOGETHER_BONUS_MAX)
+    TOGETHER_BONUS_MAX,
+    TOGETHER_REVENUE_GATE,
+    TOGETHER_SOS_GATE,
+    TOGETHER_FIVE_STAR_GATE_FAILURE,
+    )
 
 
 # Calculate Trustpilot reward
@@ -84,3 +88,31 @@ def calculate_together_bonus(stars):
 
     # Return the bonus
     return bonus
+
+
+# Check if the branch passed the Together Bonus gateways
+def check_together_bonus_gateways(revenue_vs_budget, sos_ytd):
+
+    # Check if both branch gateways were passed
+    if revenue_vs_budget >= TOGETHER_REVENUE_GATE and sos_ytd >= TOGETHER_SOS_GATE:
+        return True
+
+    # At least one gateway was missed
+    return False
+
+
+# Calculate the final Together Bonus
+def calculate_final_together_bonus(stars, revenue_vs_budget, sos_ytd):
+
+    # Check if the branch passed both gateways
+    gateways_passed = check_together_bonus_gateways(
+        revenue_vs_budget,
+        sos_ytd
+    )
+
+    # Give £300 to 5 star technicians if the branch failed a gateway
+    if not gateways_passed and stars == 5:
+        return TOGETHER_FIVE_STAR_GATE_FAILURE
+
+    # Calculate the normal bonus
+    return calculate_together_bonus(stars)

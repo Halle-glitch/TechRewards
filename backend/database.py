@@ -2,7 +2,27 @@ import sqlite3
 from backend.rules import LEAD_STATUSES, LEAD_STATUS_TRANSITIONS
 
 # Connect to the database
-connection = sqlite3.connect("techrewards.db")
+def connect_to_database(database_path="techrewards.db"):
+
+    return sqlite3.connect(database_path)
+
+# Create the database connection
+connection = connect_to_database()
+
+
+# Change the database connection
+def set_database(database_path):
+
+    global connection
+
+    # Close the current connection
+    connection.close()
+
+    # Create a new connection
+    connection = connect_to_database(database_path)
+
+    # Create the tables in the new database
+    create_tables()
 
 
 # Create the database tables
@@ -89,6 +109,26 @@ def get_lead(lead_id):
 
     # Return the lead
     return lead
+
+
+# Get all leads for a technician
+def get_leads_by_technician(technician_id):
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Find all leads for this technician
+    cursor.execute("""
+        SELECT id, technician_id, customer, opportunity, status
+        FROM leads
+        WHERE technician_id = ?
+    """, (technician_id,))
+
+    # Get all matching leads
+    leads = cursor.fetchall()
+
+    # Return the leads
+    return leads
 
 
 # Update the status of a lead

@@ -1,6 +1,8 @@
 import pytest
-from backend.database import create_lead, get_lead, update_lead_status
+import backend.database as database
+from backend.database import create_lead, get_lead, update_lead_status, get_leads_by_technician
 
+database.set_database(":memory:")
 
 # Test creating a new lead
 def test_create_lead():
@@ -75,3 +77,44 @@ def test_invalid_lead_status():
             "Spray",
             "Banana"
         )
+
+
+# Test getting all leads for a technician
+def test_get_leads_by_technician():
+
+    create_lead(
+        106,
+        "Customer One",
+        "Spray",
+        "Created"
+    )
+
+    create_lead(
+        106,
+        "Customer Two",
+        "Rodent proofing",
+        "Sent"
+    )
+
+    create_lead(
+        107,
+        "Other Customer",
+        "Cockroach treatment",
+        "Created"
+    )
+
+    leads = get_leads_by_technician(106)
+
+    assert len(leads) == 2
+    assert leads[0][1] == 106
+    assert leads[0][2] == "Customer One"
+    assert leads[1][1] == 106
+    assert leads[1][2] == "Customer Two"
+
+
+# Test getting leads for a technician with no leads
+def test_get_leads_for_technician_with_no_leads():
+
+    leads = get_leads_by_technician(9999)
+
+    assert leads == []

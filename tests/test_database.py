@@ -1,14 +1,29 @@
 import pytest
 import backend.database as database
+
 from backend.database import (
-    create_lead, 
-    get_lead, 
-    update_lead_status, 
+    create_lead,
+    get_lead,
+    update_lead_status,
     get_leads_by_technician,
-    create_reward
+    create_reward,
+    get_rewards_by_technician
 )
 
+
 database.set_database(":memory:")
+
+
+@pytest.fixture(autouse=True)
+def clean_database():
+
+    # Clear the database before each test
+    cursor = database.connection.cursor()
+
+    cursor.execute("DELETE FROM leads")
+    cursor.execute("DELETE FROM rewards")
+
+    database.connection.commit()
 
 # Test creating a new lead
 def test_create_lead():
@@ -149,3 +164,47 @@ def test_create_reward_negative_amount():
             -10,
             "5-star customer review"
         )
+
+
+# Test getting rewards for a technician
+def test_get_rewards_by_technician():
+
+    create_reward(
+        101,
+        "Trustpilot",
+        10,
+        "5-star customer review"
+    )
+
+    create_reward(
+        101,
+        "CVC",
+        50,
+        "Technician named in 10/10 feedback"
+    )
+
+    create_reward(
+        102,
+        "Trustpilot",
+        10,
+        "5-star customer review"
+    )
+
+    rewards = get_rewards_by_technician(101)
+
+    assert len(rewards) == 2
+    assert rewards[0][1] == 101
+    assert rewards[0][2] == "Trustpilot"
+    assert rewards[0][3] == 10
+
+    assert rewards[1][1] == 101
+    assert rewards[1][2] == "CVC"
+    assert rewards[1][3] == 50
+
+
+# Test getting rewards for a technician with no rewards
+def test_get_rewards_for_technician_with_no_rewards():
+
+    rewards = get_rewards_by_technician(9999)
+
+    assert rewards == []

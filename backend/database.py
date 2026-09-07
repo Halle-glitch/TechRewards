@@ -212,3 +212,23 @@ def create_reward(technician_id, reward_type, amount, description):
 
     # Return the ID of the new reward
     return cursor.lastrowid
+
+
+# Get all rewards for a technician
+def get_rewards_by_technician(technician_id):
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Find all rewards for the technician
+    cursor.execute("""
+        SELECT id, technician_id, reward_type, amount, description
+        FROM rewards
+        WHERE technician_id = ?
+    """, (technician_id,))
+
+    # Get all matching rewards
+    rewards = cursor.fetchall()
+
+    # Return the rewards
+    return rewards

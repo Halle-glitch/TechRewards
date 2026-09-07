@@ -1,19 +1,128 @@
 import sqlite3
+from backend.rules import LEAD_STATUSES, LEAD_STATUS_TRANSITIONS
 
 # Connect to the database
 connection = sqlite3.connect("techrewards.db")
 
-# Create the technicians table
+
+# Create the database tables
 def create_tables():
+
+    # Create a cursor
     cursor = connection.cursor()
 
+    # Create the technicians table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS technicians (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
-            employee_number TEXT NOT NULL)""")
+            employee_number TEXT NOT NULL
+        )
+    """)
 
+    # Create the leads table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS leads (
+            id INTEGER PRIMARY KEY,
+            technician_id INTEGER NOT NULL,
+            customer TEXT NOT NULL,
+            opportunity TEXT NOT NULL,
+            status TEXT NOT NULL
+        )
+    """)
+
+    # Save the changes
     connection.commit()
 
 # Create the tables
 create_tables()
+
+
+# Create a new lead
+def create_lead(technician_id, customer, opportunity, status):
+
+    # Check if the status is valid
+    if status not in LEAD_STATUSES:
+        raise ValueError("Invalid lead status")
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Add the lead to the database
+    cursor.execute("""
+        INSERT INTO leads (
+            technician_id,
+            customer,
+            opportunity,
+            status
+        )
+        VALUES (?, ?, ?, ?)
+    """, (
+        technician_id,
+        customer,
+        opportunity,
+        status
+    ))
+
+    # Save the changes
+    connection.commit()
+
+    # Return the ID of the new lead
+    return cursor.lastrowid
+
+
+# Get a lead from the database
+def get_lead(lead_id):
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Find the lead with this ID
+    cursor.execute("""
+        SELECT id, technician_id, customer, opportunity, status
+        FROM leads
+        WHERE id = ?
+    """, (lead_id,))
+
+    # Get the resutl
+    lead = cursor.fetchone()
+
+    # Return the lead
+    return lead
+
+
+# Update the status of a lead
+def update_lead_status(lead_id, new_status):
+
+    #Get the current lead
+    lead = get_lead(lead_id)
+
+    # Check if the lead exists
+    if lead is None:
+        raise ValueError("Lead not found")
+
+    # Get the current status
+    current_status = lead[4]
+
+    # Get the allowed next statuses
+    allowed_statuses = LEAD_STATUS_TRANSITIONS[current_status]
+
+    # Check if the new status is allowed
+    if new_status not in allowed_statuses:
+        raise ValueError("Invalid lead status transtion")
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Update the lead status
+    cursor.execute("""
+        UPDATE leads
+        SET status = ?
+        WHERE id = ?
+        """, (
+            new_status,
+            lead_id
+            ))
+
+    # SAve the changes
+    connection.commit()

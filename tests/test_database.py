@@ -1,6 +1,12 @@
 import pytest
 import backend.database as database
-from backend.database import create_lead, get_lead, update_lead_status, get_leads_by_technician
+from backend.database import (
+    create_lead, 
+    get_lead, 
+    update_lead_status, 
+    get_leads_by_technician,
+    create_reward
+)
 
 database.set_database(":memory:")
 
@@ -118,3 +124,28 @@ def test_get_leads_for_technician_with_no_leads():
     leads = get_leads_by_technician(9999)
 
     assert leads == []
+
+
+# Test creating a new reward
+def test_create_reward():
+
+    reward_id = create_reward(
+        101,
+        "Trustpilot",
+        10,
+        "5-star customer reveiw"
+    )
+
+    assert reward_id is not None
+
+
+# Test that negative rewards are rejected
+def test_create_reward_negative_amount():
+
+    with pytest.raises(ValueError):
+        create_reward(
+            101,
+            "Trustpilot",
+            -10,
+            "5-star customer review"
+        )

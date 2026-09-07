@@ -51,11 +51,24 @@ def create_tables():
         )
     """)
 
+    # Create the rewards table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS rewards (
+            id INTEGER PRIMARY KEY,
+            technician_id INTEGER NOT NULL,
+            reward_type TEXT NOT NULL,
+            amount REAL NOT NULL,
+            description TEXT NOT NULL
+        )
+    """)
+
     # Save the changes
     connection.commit()
 
 # Create the tables
 create_tables()
+
+
 
 
 # Create a new lead
@@ -166,3 +179,36 @@ def update_lead_status(lead_id, new_status):
 
     # SAve the changes
     connection.commit()
+
+
+# Create a new reward
+def create_reward(technician_id, reward_type, amount, description):
+
+    # Check that the reward amount is valid
+    if amount < 0:
+        raise ValueError("Reward amount cannot be negative")
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Add the reward to the database
+    cursor.execute("""
+        INSERT INTO rewards (
+            technician_id,
+            reward_type,
+            amount,
+            description
+        )
+        VALUES (?, ?, ?, ?)
+    """, (
+        technician_id,
+        reward_type,
+        amount,
+        description
+    ))
+
+    # Save the changes
+    connection.commit()
+
+    # Return the ID of the new reward
+    return cursor.lastrowid

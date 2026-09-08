@@ -7,7 +7,9 @@ from backend.database import (
     update_lead_status,
     get_leads_by_technician,
     create_reward,
-    get_rewards_by_technician
+    get_rewards_by_technician,
+    get_reward,
+    get_total_rewards_by_technician
 )
 
 
@@ -208,3 +210,59 @@ def test_get_rewards_for_technician_with_no_rewards():
     rewards = get_rewards_by_technician(9999)
 
     assert rewards == []
+
+
+# Test getting a reward
+def test_get_reward():
+
+    reward_id = create_reward(
+        101,
+        "Trustpilot",
+        10,
+        "5-star customer review"
+    )
+
+    reward = get_reward(reward_id)
+
+    assert reward[0] == reward_id
+    assert reward[1] == 101
+    assert reward[2] == "Trustpilot"
+    assert reward[3] == 10
+    assert reward[4] == "5-star customer review"
+
+
+# Test getting the total rewards for a technician
+def test_get_total_rewards_by_technician():
+
+    create_reward(
+        101,
+        "Trustpilot",
+        10,
+        "5-star customer review"
+    )
+
+    create_reward(
+            101,
+            "CVC",
+            50,
+            "Technician named in 10/10 feedback"
+        )
+
+    create_reward(
+            101,
+            "Referral",
+            1000,
+            "Referral completed 6 months"
+        )
+
+    total = get_total_rewards_by_technician(101)
+
+    assert total == 1060
+
+
+# Test getting total rewards when there are no rewards
+def test_get_total_rewards_with_no_rewards():
+
+    total = get_total_rewards_by_technician(9999)
+
+    assert total == 0

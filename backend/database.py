@@ -232,3 +232,47 @@ def get_rewards_by_technician(technician_id):
 
     # Return the rewards
     return rewards
+
+
+# Get a reward from the database
+def get_reward(reward_id):
+
+    # Crete a cursor
+    cursor = connection.cursor()
+
+    # Find the reward with this ID
+    cursor.execute("""
+    SELECT id, technician_id, reward_type, amount, description
+    FROM rewards
+    WHERE id = ?
+    """, (reward_id,))
+
+    # Get the result
+    reward = cursor.fetchone()
+
+    # Return the reward
+    return reward
+
+
+# Get the total rewards for  a technician
+def get_total_rewards_by_technician(technician_id):
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Add all reward amounts together
+    cursor.execute("""
+    SELECT SUM(amount)
+    FROM rewards
+    WHERE technician_id = ?
+    """, (technician_id,))
+
+    # Get the result
+    total = cursor.fetchone()[0]
+
+    # Return zero if there are no rewards
+    if total is None:
+        return 0
+
+    # Return the total rewards
+    return total

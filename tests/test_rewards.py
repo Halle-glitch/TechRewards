@@ -10,187 +10,202 @@ from backend.rewards import (
 )
 
 
-# Test a 5 star Trustpilot review
-def test_five_star_reward():
+# -------------------------
+# Trustpilot tests
+# -------------------------
 
+# Test 5 stars
+def test_trustpilot_five_stars():
     result = calculate_trustpilot_reward(5)
-
     assert result == 10
 
 
-# Test that 4 stars gives no reward
-def test_four_star_reward():
-
+# Test 4 stars
+def test_trustpilot_four_stars():
     result = calculate_trustpilot_reward(4)
-
     assert result == 0
 
 
-# Test that 1 star gives no reward
-def test_one_star_reward():
-
+# Test 1 star
+def test_trustpilot_one_star():
     result = calculate_trustpilot_reward(1)
-
     assert result == 0
 
 
-# Test a normal 10/10 CVC score
-def test_cvc_ten_score():
+# -------------------------
+# CVC tests
+# -------------------------
 
-    result = calculate_cvc_reward(10, False)
-
-    assert result == 10
-
-
-# Test a 10/10 score when the technician is named
-def test_cvc_named_technician():
-
+# Test 10/10 with technician named
+def test_cvc_ten_named():
     result = calculate_cvc_reward(10, True)
-
     assert result == 50
 
 
-# Test that a score below 10 gives no reward
+# Test 10/10 without technician named
+def test_cvc_ten_not_named():
+    result = calculate_cvc_reward(10, False)
+    assert result == 10
+
+
+# Test score below 10
 def test_cvc_below_ten():
-
     result = calculate_cvc_reward(9, True)
-
     assert result == 0
 
 
-# Test that a referral before 6 months gives no reward
+# -------------------------
+# Referral tests
+# -------------------------
+
+# Test referral before 6 months
 def test_referral_before_six_months():
-
     result = calculate_referral_reward(5)
-
     assert result == 0
 
 
-# Test that a referral reaching 6 months gives £1,000
-def test_referral_after_six_months():
-
+# Test referral at 6 months
+def test_referral_six_months():
     result = calculate_referral_reward(6)
-
     assert result == 1000
 
 
-# Test that a referral staying longer than 6 months still gives £1,000
-def test_referral_after_more_than_six_months():
-
+# Test referral after 6 months
+def test_referral_after_six_months():
     result = calculate_referral_reward(12)
-
     assert result == 1000
 
 
-# Test that 4 years of service gives no extra days
+# -------------------------
+# Long Service tests
+# -------------------------
+
+# Test before 5 years
 def test_long_service_before_five_years():
-
     result = calculate_long_service_reward(4)
-
     assert result == 0
 
 
-# Test that 5 years of service gives 5 extra days
-def test_long_service_after_five_years():
-
+# Test at 5 years
+def test_long_service_five_years():
     result = calculate_long_service_reward(5)
-
     assert result == 5
 
 
-# Test that more than 5 years still gives 5 extra days
-def test_long_service_more_than_five_years():
-
+# Test after 5 years
+def test_long_service_ten_years():
     result = calculate_long_service_reward(10)
-
     assert result == 5
 
 
-# Test the lowest scorecard star range
-def test_scorecard_one_star():
+# -------------------------
+# Scorecard star tests
+# -------------------------
+
+# Test 10 points = 1 star
+def test_scorecard_ten_points():
     result = get_scorecard_stars(10)
     assert result == 1
 
 
-# Test the second star range
-def test_scorecard_two_stars():
+# Test 14 points = 2 stars
+def test_scorecard_fourteen_points():
     result = get_scorecard_stars(14)
     assert result == 2
 
 
-# Test the third star range
-def test_scorecard_three_stars():
+# Test 19 points = 3 stars
+def test_scorecard_nineteen_points():
     result = get_scorecard_stars(19)
     assert result == 3
 
 
-# Test the fourth star range
-def test_scorecard_four_stars():
+# Test 23 points = 4 stars
+def test_scorecard_twenty_three_points():
     result = get_scorecard_stars(23)
     assert result == 4
 
 
-# Test the fifth star range
-def test_scorecard_five_stars():
+# Test 25 points = 5 stars
+def test_scorecard_twenty_five_points():
     result = get_scorecard_stars(25)
     assert result == 5
 
 
-# Test the Together Bonus for 3 stars
+# -------------------------
+# Together Bonus tests
+# -------------------------
+
+# Test 3 stars
 def test_together_bonus_three_stars():
     result = calculate_together_bonus(3)
     assert result == 975
 
 
-# Test the Together Bonus for 1 star
+# Test 1 star
 def test_together_bonus_one_star():
     result = calculate_together_bonus(1)
     assert result == 682.5
 
 
-# Test the Together Bonus for 2 stars
+# Test 2 stars
 def test_together_bonus_two_stars():
     result = calculate_together_bonus(2)
     assert result == 828.75
 
 
-# Test the Together Bonus for 4 stars
+# Test 4 stars
 def test_together_bonus_four_stars():
     result = calculate_together_bonus(4)
     assert result == 1121.25
 
 
-# Test the Together Bonus for 5 stars
+# Test 5 stars
 def test_together_bonus_five_stars():
     result = calculate_together_bonus(5)
     assert result == 1267.5
 
 
-# Test that the branch passes both Together Bonus gateways
+# -------------------------
+# Together Bonus gateway tests
+# ------------------------- 
+
+# Test both gateways pass
 def test_together_bonus_gateways_pass():
     result = check_together_bonus_gateways(0.98, 0.95)
     assert result is True
 
 
-# Test that the branch fails when revenue is below the gateway
-def test_together_bonus_revenue_gateway_fails():
+# Test revenue gateway fails
+def test_together_bonus_revenue_fails():
     result = check_together_bonus_gateways(0.97, 0.95)
     assert result is False
 
 
-# Test that the branch fails when SOS is below the gateway
-def test_together_bonus_sos_gateway_fails():
+# Test SOS gateway fails
+def test_together_bonus_sos_fails():
     result = check_together_bonus_gateways(0.98, 0.94)
     assert result is False
 
 
-# Test that the branch fails when both gateways are below the minimum
+# Test both gateways fail
 def test_together_bonus_both_gateways_fail():
     result = check_together_bonus_gateways(0.97, 0.94)
     assert result is False
 
 
-# Test the final Together Bonus when 5 stars and gateways pass
+# -------------------------
+# Final Together Bonus tests
+# -------------------------
+
+# Test 5 stars when both gateways pass
 def test_final_together_bonus_five_stars_gateways_pass():
     result = calculate_final_together_bonus(5, 0.98, 0.95)
     assert result == 1267.5
+
+
+# Test 5 stars when a gateway fails
+def test_final_together_bonus_five_stars_gateway_fails():
+    result = calculate_final_together_bonus(5, 0.97, 0.95)
+    assert result == 300
+

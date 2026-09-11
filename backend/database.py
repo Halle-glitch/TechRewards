@@ -276,3 +276,32 @@ def get_total_rewards_by_technician(technician_id):
 
     # Return the total rewards
     return total
+
+
+# Create a lead commission reward
+def create_lead_commission_reward(
+    technician_id,
+    total_converted,
+    sale_value,
+    description
+):
+
+    # Import the commission calculation
+    from backend.commission import calculate_lead_commission
+
+    # Calculate the commission
+    commission = calculate_lead_commission(
+        total_converted,
+        sale_value
+    )
+
+    # Save the commission as a reward
+    reward_id = create_reward(
+        technician_id,
+        "Lead Commission",
+        commission,
+        description
+    )
+
+    # Return the reward ID
+    return reward_id

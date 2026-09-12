@@ -10,7 +10,8 @@ from backend.database import (
     get_rewards_by_technician,
     get_reward,
     get_total_rewards_by_technician,
-    create_lead_commission_reward
+    create_lead_commission_reward,
+    get_total_lead_commission_by_technician,
 )
 
 
@@ -295,3 +296,36 @@ def test_create_lead_commission_reward_crossing_threshold():
     reward = get_reward(reward_id)
 
     assert reward[3] == 18.5
+
+
+def test_get_total_lead_commission_by_technician():
+    create_reward(
+        101,
+        "Lead Commission",
+        50,
+        "First lead"
+    )
+
+    create_reward(
+        101,
+        "Lead Commission",
+        18.5,
+        "Second lead"
+    )
+
+    create_reward(
+        101,
+        "Trustpilot",
+        10,
+        "Five-star review"
+    )
+
+    total = get_total_lead_commission_by_technician(101)
+
+    assert total == 68.5
+
+
+def test_no_lead_commission_returns_zero():
+    total = get_total_lead_commission_by_technician(101)
+
+    assert total == 0

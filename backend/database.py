@@ -305,3 +305,31 @@ def create_lead_commission_reward(
 
     # Return the reward ID
     return reward_id
+
+
+# Get total lead commission for a technician
+def get_total_lead_commission_by_technician(technician_id):
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Find all lead commission rewards for this technician
+    cursor.execute(
+        """
+        SELECT SUM(amount)
+        FROM rewards
+        WHERE technician_id = ?
+        AND reward_type = ?
+        """,
+        (technician_id, "Lead Commission")
+    )
+
+    # Get the result
+    result = cursor.fetchone()[0]
+
+    # Return zero if there are no lead commissions
+    if result is None:
+        return 0
+
+    # Return the total commission
+    return result

@@ -1,10 +1,14 @@
 import sqlite3
 from backend.rules import LEAD_STATUSES, LEAD_STATUS_TRANSITIONS
 
-# Connect to the database
+# connect to database
 def connect_to_database(database_path="techrewards.db"):
 
-    return sqlite3.connect(database_path)
+    # Allow the connection to work with FastAPI threads
+    return sqlite3.connect(
+        database_path,
+        check_same_thread=False
+    )
 
 # Create the database connection
 connection = connect_to_database()

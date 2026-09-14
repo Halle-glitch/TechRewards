@@ -333,3 +333,47 @@ def get_total_lead_commission_by_technician(technician_id):
 
     # Return the total commission
     return result
+
+
+# Create a new technician
+def create_technician(name, employee_number):
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Add the technician to the database
+    cursor.execute("""
+        INSERT INTO technicians (
+            name,
+            employee_number
+        )
+        VALUES (?, ?)
+    """, (
+        name,
+        employee_number
+    ))
+
+    # Save the changes
+    connection.commit()
+
+    # Return the ID of the new technician
+    return cursor.lastrowid
+
+# Get a technician from the database
+def get_technician(technician_id):
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Find the technician with this ID
+    cursor.execute("""
+        SELECT id, name, employee_number
+        FROM technicians
+        WHERE id = ?
+    """, (technician_id,))
+
+    # Get the result
+    technician = cursor.fetchone()
+
+    # Return the technician
+    return technician

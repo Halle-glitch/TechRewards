@@ -4,14 +4,16 @@ import backend.database as database
 from backend.database import (
     create_lead,
     get_lead,
-    update_lead_status,
     get_leads_by_technician,
+    update_lead_status,
     create_reward,
     get_rewards_by_technician,
     get_reward,
     get_total_rewards_by_technician,
     create_lead_commission_reward,
     get_total_lead_commission_by_technician,
+    create_technician,
+    get_technician,
 )
 
 
@@ -329,3 +331,23 @@ def test_no_lead_commission_returns_zero():
     total = get_total_lead_commission_by_technician(101)
 
     assert total == 0
+
+
+
+def test_create_technician():
+    technician_id = create_technician(
+        "Miguel",
+        "RT001"
+    )
+
+    technician = get_technician(technician_id)
+
+    assert technician[0] == technician_id
+    assert technician[1] == "Miguel"
+    assert technician[2] == "RT001"
+
+
+def test_get_missing_technician():
+    technician = get_technician(999)
+
+    assert technician is None

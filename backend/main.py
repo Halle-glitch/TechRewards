@@ -6,6 +6,8 @@ from backend.database import (
     get_technician,
     create_lead,
     get_lead,
+    update_lead_status,
+    get_leads_by_technician,
 )
 
 
@@ -34,6 +36,11 @@ class LeadCreate(BaseModel):
 
     # Current lead status
     status: str = "Created"
+
+class LeadStatusUpdate(BaseModel):
+
+    # Bew status for the lead
+    status: str
 
 
 @app.get("/health")
@@ -122,3 +129,66 @@ def read_lead(lead_id: int):
         "opportunity": lead[3],
         "status": lead[4]
     }
+
+
+@app.put("/leads/{lead_id}/status")
+def change_lead_status(
+    lead_id: int,
+    status_data: LeadStatusUpdate
+):
+
+    # Update the lead status in the database
+    try:
+        update_lead_status(
+            lead_id,
+            status_data.status
+        )
+
+    # Return an error if the status change if invalid
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )
+
+    # Get the updated lead
+    lead = get_lead(lead_id)
+
+    # Return an error if the lead does not exist
+    if lead is None:
+        raise HTTPException(
+            status_code=404,
+            details="Lead not found"
+        )
+
+    # Return the updated lead
+    return {
+        "message": "Lead status updated successfully",
+        "lead_id": lead[0],
+        "status": lead[4]
+    }
+
+@app.get("/technicians/{technician_id}/leads")
+def read_technician_leads(technician_id: int):
+
+    # Get all leads for this technician
+    leads = get_leads_by_technician(technician_id)
+
+    # Return an error if no leads exist
+    if not leads:
+        raise HTTPException(
+            status_code=404,
+            detail="No leads found for this technician"
+        )
+
+    # Return the leads
+    return [
+        {
+            "id": lead[0],
+            "technician_id": lead[1],
+            "customer": lead[2],
+            "opportunity": lead[3],
+            "status": lead[4],
+        }
+        for lead in leads
+    ]

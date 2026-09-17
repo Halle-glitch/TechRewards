@@ -8,6 +8,7 @@ from backend.database import (
     get_lead,
     update_lead_status,
     get_leads_by_technician,
+    get_rewards_by_technician,
 )
 
 
@@ -191,4 +192,30 @@ def read_technician_leads(technician_id: int):
             "status": lead[4],
         }
         for lead in leads
+    ]
+
+
+@app.get("/technicians/{technician_id: int}/rewards")
+def read_technician_rewards(technician_id: int):
+
+    # Get all rewards for this technician
+    rewards = get_rewards_by_technician(technician_id)
+
+    # Return an error if no rewards exist
+    if not rewards:
+        raise HTTPException(
+            status_code=404,
+            detail="No rewards found for this technician"
+        )
+
+    # Return the rewards
+    return [
+        {
+            "id": reward[0],
+            "technician_id": reward[1],
+            "reward_type": reward[2],
+            "amount": reward[3],
+            "description": reward[4],
+        }
+        for reward in rewards
     ]

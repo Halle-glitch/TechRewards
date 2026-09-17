@@ -9,6 +9,7 @@ from backend.database import (
     update_lead_status,
     get_leads_by_technician,
     get_rewards_by_technician,
+    get_total_rewards_by_technician,
 )
 
 
@@ -219,3 +220,15 @@ def read_technician_rewards(technician_id: int):
         }
         for reward in rewards
     ]
+
+@app.get("/technicians/{technician_id}/rewards/total")
+def read_total_rewards(technician_id: int):
+
+    # Get the total rewards for this technician
+    total_rewards = get_total_rewards_by_technician(technician_id)
+
+    # Return the total rewards
+    return {
+        "technician_id": technician_id,
+        "total_rewards": total_rewards,
+    }

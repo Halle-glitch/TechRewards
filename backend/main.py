@@ -11,6 +11,8 @@ from backend.database import (
     get_rewards_by_technician,
     get_total_rewards_by_technician,
     create_reward,
+    create_lead_commission_reward,
+    get_total_lead_commission_by_technician,
 )
 
 
@@ -197,7 +199,7 @@ def read_technician_leads(technician_id: int):
     ]
 
 
-@app.get("/technicians/{technician_id: int}/rewards")
+@app.get("/technicians/{technician_id}/rewards")
 def read_technician_rewards(technician_id: int):
 
     # Get all rewards for this technician
@@ -255,4 +257,53 @@ def create_new_reward(
     return {
         "message": "Reward created successfully",
         "reward_id": reward_id
+    }
+
+
+@app.post("/technicians/{technician_id}/lead-commission")
+def create_technician_lead_commission(
+    technician_id: int,
+    total_converted: float,
+    sale_value: float
+):
+
+    # Create the lead commission reward
+    reward_id = create_lead_commission_reward(
+        technician_id,
+        total_converted,
+        sale_value,
+        "Lead commission reward"
+    )
+
+    # Return the created reward ID
+    return {
+        "message": "Lead commission created sucessfully",
+        "reward_id": reward_id
+    }
+
+
+@app.get("/technicians/{technician_id}/lead-commission/total")
+def read_total_lead_commission(technician_id: int):
+
+    # Get the total lead commission
+    total_commission = get_total_lead_commission_by_technician(
+        technician_id
+    )
+
+    # Return the total commission
+    return {
+        "technician_id": technician_id,
+        "total_lead_commission": total_commission
+    }
+
+
+@app.get("/technicians/{technician_id}/dashboard")
+def read_technician_dashboard(technician_id: int):
+    total_rewards = get_total_rewards_by_technician(technician_id)
+    total_commission = get_total_lead_commission_by_technician(technician_id)
+
+    return {
+        "technician_id": technician_id,
+        "total_rewards": total_rewards,
+        "total_lead_commission": total_commission,
     }

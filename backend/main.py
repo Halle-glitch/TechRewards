@@ -10,6 +10,7 @@ from backend.database import (
     get_leads_by_technician,
     get_rewards_by_technician,
     get_total_rewards_by_technician,
+    create_reward,
 )
 
 
@@ -231,4 +232,27 @@ def read_total_rewards(technician_id: int):
     return {
         "technician_id": technician_id,
         "total_rewards": total_rewards,
+    }
+
+
+@app.post("/rewards")
+def create_new_reward(
+    technician_id: int,
+    reward_type: str,
+    amount: float,
+    description: str
+):
+
+    # Create the reward in the database
+    reward_id = create_reward(
+        technician_id,
+        reward_type,
+        amount,
+        description
+    )
+
+    # Return the created reward ID
+    return {
+        "message": "Reward created successfully",
+        "reward_id": reward_id
     }

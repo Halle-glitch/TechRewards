@@ -13,6 +13,7 @@ from backend.database import (
     create_reward,
     create_lead_commission_reward,
     get_total_lead_commission_by_technician,
+    get_lead_counts_by_technician,
 )
 
 
@@ -301,9 +302,13 @@ def read_total_lead_commission(technician_id: int):
 def read_technician_dashboard(technician_id: int):
     total_rewards = get_total_rewards_by_technician(technician_id)
     total_commission = get_total_lead_commission_by_technician(technician_id)
+    lead_counts = get_lead_counts_by_technician(technician_id)
 
     return {
         "technician_id": technician_id,
         "total_rewards": total_rewards,
         "total_lead_commission": total_commission,
+        "total_leads": lead_counts["total_leads"],
+        "won_leads": lead_counts["won_leads"],
+        "lost_leads": lead_counts["lost_leads"],
     }

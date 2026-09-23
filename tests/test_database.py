@@ -14,6 +14,7 @@ from backend.database import (
     get_total_lead_commission_by_technician,
     create_technician,
     get_technician,
+    get_lead_counts_by_technician
 )
 
 
@@ -437,3 +438,20 @@ def test_get_missing_technician():
 
     # The result should be None
     assert technician is None
+
+
+def test_get_lead_counts_by_technician():
+    # Test lead counts for one technician
+    technician_id = create_technician("Test Tech", "TEST001")
+
+    create_lead(technician_id, "Customer 1", 1000, "Created")
+
+    create_lead(technician_id, "Customer 2", 2000, "Won")
+
+    create_lead(technician_id, "Customer 3", 500, "Lost")
+
+    result = get_lead_counts_by_technician(technician_id)
+
+    assert result["total_leads"] == 3
+    assert result["won_leads"] == 1
+    assert result["lost_leads"] == 1

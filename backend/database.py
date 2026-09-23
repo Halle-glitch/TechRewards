@@ -381,3 +381,27 @@ def get_technician(technician_id):
 
     # Return the technician
     return technician
+
+
+def get_lead_counts_by_technician(technician_id):
+    # Get lead counts for one technician
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+        COUNT(*),
+        SUM(CASE WHEN status = 'Won' THEN 1 ELSE 0 END),
+        SUM(CASE WHEN status = 'Lost' THEN 1 ELSE 0 END)
+        FROM leads
+        WHERE technician_id = ?
+        """, (technician_id,)
+    )
+
+    result = cursor.fetchone()
+
+    return {
+        "total_leads": result[0],
+        "won_leads": result[1] or 0,
+        "lost_leads": result[2] or 0,
+    }

@@ -53,7 +53,34 @@ SCORECARD_MODIFIERS = {
 
 # Together Bonus
 # Together Bonus maximum quarterly payout
-TOGETHER_BONUS_MAX = 975
+TOGETHER_BONUS_MAX = 750
+
+
+# Together Bonus payout table for Revenue vs Budget and SOS
+TOGETHER_BONUS_TABLE = {
+    0.98: {
+        0.95: 300,
+        0.96: 325,
+    },
+    1.00: {
+        0.95: 400,
+        0.96: 425,
+        0.97: 450,
+    },
+    1.05: {
+        0.95: 500,
+        0.96: 525,
+        0.97: 550,
+        0.98: 575,
+    },
+    1.10: {
+        0.95: 650,
+        0.96: 675,
+        0.97: 700,
+        0.98: 725,
+        0.99: 750,
+    },
+}
 
 
 # Together Bonus branch gateways

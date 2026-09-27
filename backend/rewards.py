@@ -9,10 +9,12 @@ from backend.rules import (
     SCORECARD_STAR_RANGES,
     SCORECARD_MODIFIERS,
     TOGETHER_BONUS_MAX,
+    TOGETHER_BONUS_TABLE,
     TOGETHER_REVENUE_GATE,
     TOGETHER_SOS_GATE,
     TOGETHER_FIVE_STAR_GATE_FAILURE,
-    )
+)
+
 
 
 # Calculate Trustpilot reward
@@ -78,13 +80,34 @@ def get_scorecard_stars(points):
 
 
 # Calculate the Together Bonus
-def calculate_together_bonus(stars):
+def calculate_together_bonus(stars, revenue_vs_budget, sos_ytd):
+
+    # Find the correct Revenue vs Budget row
+    if revenue_vs_budget >= 1.10:
+        revenue_row = 1.10
+    elif revenue_vs_budget >= 1.05:
+        revenue_row = 1.05
+    elif revenue_vs_budget >= 1.00:
+        revenue_row = 1.00
+    elif revenue_vs_budget >= 0.98:
+        revenue_row = 0.98
+    else:
+        return 0
+
+    # Find the highest SOS payout available
+    sos_options = TOGETHER_BONUS_TABLE[revenue_row]
+
+    base_bonus = 0
+
+    for sos_threshold, payout in sos_options.items():
+        if sos_ytd >= sos_threshold:
+            base_bonus = payout
 
     # Get the modifier for the number of stars
     modifier = SCORECARD_MODIFIERS[stars]
 
-    # Calculate the bonus
-    bonus = TOGETHER_BONUS_MAX * (1 + modifier)
+    # Apply the scorecard modifier
+    bonus = base_bonus * (1 + modifier)
 
     # Return the bonus
     return bonus
@@ -115,4 +138,8 @@ def calculate_final_together_bonus(stars, revenue_vs_budget, sos_ytd):
         return TOGETHER_FIVE_STAR_GATE_FAILURE
 
     # Calculate the normal bonus
-    return calculate_together_bonus(stars)
+    return calculate_together_bonus(
+        stars,
+        revenue_vs_budget,
+        sos_ytd
+    )

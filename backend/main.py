@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from backend.rewards import calculate_final_together_bonus
+
 
 from backend.database import (
     create_technician,
@@ -48,6 +50,10 @@ class LeadStatusUpdate(BaseModel):
     # Bew status for the lead
     status: str
 
+class TogetherBonusRequest(BaseModel):
+    stars: int
+    revenue_vs_budget: float
+    sos_ytd: float
 
 @app.get("/health")
 def health_check():
@@ -311,4 +317,21 @@ def read_technician_dashboard(technician_id: int):
         "total_leads": lead_counts["total_leads"],
         "won_leads": lead_counts["won_leads"],
         "lost_leads": lead_counts["lost_leads"],
+    }
+
+
+
+@app.post("/together-bonus")
+def calculate_together_bonus_endpoint(data: TogetherBonusRequest):
+    bonus =  calculate_final_together_bonus(
+        data.stars,
+        data.revenue_vs_budget,
+        data.sos_ytd
+    )
+
+    return {
+        "stars": data.stars,
+        "revenue_vs_budget": data.revenue_vs_budget,
+        "sos_ytd": data.sos_ytd,
+        "together_bonus": bonus,
     }

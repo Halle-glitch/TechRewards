@@ -1,3 +1,5 @@
+import pytest
+
 from backend.rewards import (
     calculate_trustpilot_reward,
     calculate_cvc_reward,
@@ -138,32 +140,32 @@ def test_scorecard_twenty_five_points():
 
 # Test 3 stars
 def test_together_bonus_three_stars():
-    result = calculate_together_bonus(3)
-    assert result == 975
+    result = calculate_together_bonus(3, 1.10, 0.99)
+    assert result == 750
 
 
 # Test 1 star
 def test_together_bonus_one_star():
-    result = calculate_together_bonus(1)
-    assert result == 682.5
+    result = calculate_together_bonus(1, 1.10, 0.99)
+    assert result == 525
 
 
 # Test 2 stars
 def test_together_bonus_two_stars():
-    result = calculate_together_bonus(2)
-    assert result == 828.75
+    result = calculate_together_bonus(2, 1.10, 0.99)
+    assert result == 637.5
 
 
 # Test 4 stars
 def test_together_bonus_four_stars():
-    result = calculate_together_bonus(4)
-    assert result == 1121.25
+    result = calculate_together_bonus(4, 1.10, 0.99)
+    assert result == pytest.approx(862.5)
 
 
 # Test 5 stars
 def test_together_bonus_five_stars():
-    result = calculate_together_bonus(5)
-    assert result == 1267.5
+    result = calculate_together_bonus(5, 1.10, 0.99)
+    assert result == 975
 
 
 # -------------------------
@@ -201,7 +203,7 @@ def test_together_bonus_both_gateways_fail():
 # Test 5 stars when both gateways pass
 def test_final_together_bonus_five_stars_gateways_pass():
     result = calculate_final_together_bonus(5, 0.98, 0.95)
-    assert result == 1267.5
+    assert result == 390
 
 
 # Test 5 stars when a gateway fails

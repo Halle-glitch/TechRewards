@@ -58,13 +58,22 @@ def create_tables():
     # Create the rewards table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS rewards (
-            id INTEGER PRIMARY KEY,
-            technician_id INTEGER NOT NULL,
-            reward_type TEXT NOT NULL,
-            amount REAL NOT NULL,
-            description TEXT NOT NULL
-        )
+        id INTEGER PRIMARY KEY,
+        technician_id INTEGER NOT NULL,
+        reward_type TEXT NOT NULL,
+        amount REAL NOT NULL,
+        description TEXT NOT NULL,
+        quarter TEXT
+    )
     """)
+
+# Check if quarter column already exists
+    cursor.execute("PRAGMA table_info(rewards)")
+    columns = [column[1] for column in cursor.fetchall()]
+
+# Add quarter column if it does not exist
+    if "quarter" not in columns:
+        cursor.execute("ALTER TABLE rewards ADD COLUMN quarter TEXT")
 
     # Save the changes
     connection.commit()
@@ -186,7 +195,7 @@ def update_lead_status(lead_id, new_status):
 
 
 # Create a new reward
-def create_reward(technician_id, reward_type, amount, description):
+def create_reward(technician_id, reward_type, amount, description, quarter=None):
 
     # Check that the reward amount is valid
     if amount < 0:
@@ -201,14 +210,16 @@ def create_reward(technician_id, reward_type, amount, description):
             technician_id,
             reward_type,
             amount,
-            description
+            description,
+            quarter
         )
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?)
     """, (
         technician_id,
         reward_type,
         amount,
-        description
+        description,
+        quarter
     ))
 
     # Save the changes
@@ -216,6 +227,31 @@ def create_reward(technician_id, reward_type, amount, description):
 
     # Return the ID of the new reward
     return cursor.lastrowid
+
+
+def reward_exists_for_quarter(technician_id, reward_type, quarter):
+
+    # Check if this reward already exists
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT id
+        FROM rewards
+        WHERE technician_id = ?
+        AND reward_type = ?
+        AND quarter = ?
+        """,
+        (
+            technician_id,
+            reward_type,
+            quarter
+        )
+    )
+
+    result = cursor.fetchone()
+
+    return result is not None
 
 
 # Get all rewards for a technician

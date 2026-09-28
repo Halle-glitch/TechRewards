@@ -13,6 +13,7 @@ from backend.database import (
     get_rewards_by_technician,
     get_total_rewards_by_technician,
     create_reward,
+    reward_exists_for_quarter,
     create_lead_commission_reward,
     get_total_lead_commission_by_technician,
     get_lead_counts_by_technician,
@@ -51,6 +52,8 @@ class LeadStatusUpdate(BaseModel):
     status: str
 
 class TogetherBonusRequest(BaseModel):
+    technician_id: int
+    quarter: str
     stars: int
     revenue_vs_budget: float
     sos_ytd: float
@@ -327,6 +330,27 @@ def calculate_together_bonus_endpoint(data: TogetherBonusRequest):
         data.stars,
         data.revenue_vs_budget,
         data.sos_ytd
+    )
+
+
+    if reward_exists_for_quarter(
+        data.technician_id,
+        "Together Bonus",
+        data.quarter
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Together Bonus already exists for this quarter"
+        )
+
+
+
+    create_reward(
+        data.technician_id,
+        "Together Bonus",
+        bonus,
+        "Together Bonus quarterly reward",
+        data.quarter
     )
 
     return {

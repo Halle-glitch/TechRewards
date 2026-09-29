@@ -11,6 +11,12 @@ from backend.rewards import (
     calculate_final_together_bonus,
 )
 
+from backend.database import(
+    reward_exists_for_quarter,
+    create_reward,
+)
+
+
 
 # -------------------------
 # Trustpilot tests
@@ -211,3 +217,21 @@ def test_final_together_bonus_five_stars_gateway_fails():
     result = calculate_final_together_bonus(5, 0.97, 0.95)
     assert result == 300
 
+
+# Test duplicate Together Bonus
+def test_duplicate_together_bonus():
+    create_reward(
+        1,
+        "Together Bonus",
+        390,
+        "Together Bonus quarterly reward",
+        "2026-Q3"
+    )
+
+    result = reward_exists_for_quarter(
+        1,
+        "Together Bonus",
+        "2026-Q3"
+    )
+
+    assert result is True

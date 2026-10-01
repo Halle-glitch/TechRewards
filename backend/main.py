@@ -176,6 +176,10 @@ def change_lead_status(
             details="Lead not found"
         )
 
+    # Check if the lead was won
+    if status_data.status == "Won":
+        print("Lead won - commission will be calculated")
+
     # Return the updated lead
     return {
         "message": "Lead status updated successfully",

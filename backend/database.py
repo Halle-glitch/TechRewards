@@ -441,3 +441,33 @@ def get_lead_counts_by_technician(technician_id):
         "won_leads": result[1] or 0,
         "lost_leads": result[2] or 0,
     }
+
+
+
+# Get total value of previous won leads for a technician
+def get_total_won_leads_value(technician_id, exclude_lead_id=None):
+
+    # Create a cursor
+    cursor = connection.cursor()
+
+    # Get the value of previous won leads
+    cursor.execute(
+        """
+        SELECT SUM(opportunity)
+        FROM leads
+        WHERE technician_id = ?
+        AND status = 'Won'
+        AND id != COALESCE(?, -1)
+        """,
+        (technician_id, exclude_lead_id)
+    )
+
+    # Get the result
+    result = cursor.fetchone()[0]
+
+    # Return zero if there are no won leads
+    if result is None:
+        return 0
+
+    # Return the total value
+    return result

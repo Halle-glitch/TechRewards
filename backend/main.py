@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from backend.rewards import calculate_final_together_bonus
-
+from backend.commission import calculate_lead_commission
 
 from backend.database import (
     create_technician,
@@ -17,10 +17,12 @@ from backend.database import (
     create_lead_commission_reward,
     get_total_lead_commission_by_technician,
     get_lead_counts_by_technician,
+    get_total_won_leads_value,
 )
 
 
 app = FastAPI()
+
 
 
 class TechnicianCreate(BaseModel):
@@ -146,46 +148,65 @@ def read_lead(lead_id: int):
     }
 
 
+
 @app.put("/leads/{lead_id}/status")
 def change_lead_status(
     lead_id: int,
     status_data: LeadStatusUpdate
 ):
-
-    # Update the lead status in the database
-    try:
-        update_lead_status(
-            lead_id,
-            status_data.status
-        )
-
-    # Return an error if the status change if invalid
-    except ValueError as error:
-        raise HTTPException(
-            status_code=400,
-            detail=str(error)
-        )
-
-    # Get the updated lead
+    # Get the lead before changing its status
     lead = get_lead(lead_id)
 
     # Return an error if the lead does not exist
     if lead is None:
         raise HTTPException(
             status_code=404,
-            details="Lead not found"
+            detail="Lead not found"
         )
 
-    # Check if the lead was won
+    # Calculate commission before changing the status
     if status_data.status == "Won":
-        print("Lead won - commission will be calculated")
+
+        total_converted = get_total_won_leads_value(
+            lead[1],
+            exclude_lead_id=lead_id
+        )
+
+        commission = calculate_lead_commission(
+            total_converted,
+            float(lead[3])
+        )
+
+    # Update the lead status
+    try:
+        update_lead_status(
+            lead_id,
+            status_data.status
+        )
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )
+
+    # Save commission after a successful status change
+    if status_data.status == "Won":
+        create_reward(
+            lead[1],
+            "Lead Commission",
+            commission,
+            f"Lead commission for lead {lead_id}"
+        )
 
     # Return the updated lead
+    updated_lead = get_lead(lead_id)
+
     return {
         "message": "Lead status updated successfully",
-        "lead_id": lead[0],
-        "status": lead[4]
+        "lead_id": updated_lead[0],
+        "status": updated_lead[4]
     }
+
 
 @app.get("/technicians/{technician_id}/leads")
 def read_technician_leads(technician_id: int):

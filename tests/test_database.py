@@ -14,7 +14,8 @@ from backend.database import (
     get_total_lead_commission_by_technician,
     create_technician,
     get_technician,
-    get_lead_counts_by_technician
+    get_lead_counts_by_technician,
+    get_total_won_leads_value,
 )
 
 
@@ -455,3 +456,16 @@ def test_get_lead_counts_by_technician():
     assert result["total_leads"] == 3
     assert result["won_leads"] == 1
     assert result["lost_leads"] == 1
+
+
+def test_get_total_won_leads_value():
+    # Test total value of won leads
+    technician_id = create_technician("Test Tech", "TEST002")
+
+    create_lead(technician_id, "Customer 1", 1000, "Created")
+    create_lead(technician_id, "Customer 2", 2000, "Won")
+    create_lead(technician_id, "Customer 3", 500, "Won")
+
+    result = get_total_won_leads_value(technician_id)
+
+    assert result == 2500

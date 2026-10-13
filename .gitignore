@@ -1,0 +1,12 @@
+# Python temporary files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+
+# Local database
+techrewards.db
+
+# Test cache
+.pytest_cache/
